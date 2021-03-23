@@ -27,6 +27,7 @@
 package processor
 
 import (
+	"github.com/hyperledger/sawtooth-sdk-go/src/protobuf/smartcontract_pb2"
 	"protobuf/processor_pb2"
 )
 
@@ -63,4 +64,15 @@ type TransactionHandler interface {
 	// understands and will pass in the TpProcessRequest and an initialized
 	// instance of the Context type.
 	Apply(*processor_pb2.TpProcessRequest, *Context) error
+
+	// Validate is the single method where all pre-validations are defined.
+	//The method is called by the transaction processor upon receiving a
+	//TpProcessRequest that the handler martContractValidationRequest.
+	Validate(*smartcontract_pb2.SmartContractValidationRequest) (ValidateResponse,error)
+}
+
+type ValidateResponse struct {
+	SignatureScheme string
+	N int
+	T int
 }

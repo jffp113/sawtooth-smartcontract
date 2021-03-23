@@ -55,6 +55,7 @@ func main() {
 		os.Exit(2)
 	}
 
+	logger.Debug(opts)
 	endpoint := opts.Connect
 
 	switch len(opts.Verbose) {

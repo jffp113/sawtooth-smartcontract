@@ -78,10 +78,10 @@ def fix_import(contents, pkg, sub_dir=False):
 
 
 def main():
-    protoc_go("protos", "./", "protobuf")
-    protoc_go("examples/smallbank/protos",
-              "examples/smallbank/smallbank_go/src",
-              "protobuf")
+    protoc_go("protos", "./", "./src/protobuf")
+    # protoc_go("examples/smallbank/protos",
+    #           "examples/smallbank/smallbank_go/src",
+    #           "protobuf")
 
 
 if __name__ == "__main__":

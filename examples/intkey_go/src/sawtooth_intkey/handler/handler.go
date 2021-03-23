@@ -25,6 +25,7 @@ import (
 	"github.com/hyperledger/sawtooth-sdk-go/logging"
 	"github.com/hyperledger/sawtooth-sdk-go/processor"
 	"protobuf/processor_pb2"
+	"github.com/hyperledger/sawtooth-sdk-go/src/protobuf/smartcontract_pb2"
 	"strings"
 )
 
@@ -63,6 +64,16 @@ func (self *IntkeyHandler) FamilyVersions() []string {
 
 func (self *IntkeyHandler) Namespaces() []string {
 	return []string{self.namespace}
+}
+
+func (self *IntkeyHandler) Validate(request *smartcontract_pb2.SmartContractValidationRequest) (processor.ValidateResponse, error) {
+	//TODO implement a more complex logic
+	return processor.ValidateResponse{
+		//Type: THS/normal/multisignature
+		SignatureScheme: "TBLS256",
+		N:               5,
+		T:               3,
+	}, nil
 }
 
 func (self *IntkeyHandler) Apply(request *processor_pb2.TpProcessRequest, context *processor.Context) error {

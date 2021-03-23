@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/sawtooth-sdk-go/messaging"
-	"protobuf/events_pb2"
+	"github.com/hyperledger/sawtooth-sdk-go/src/protobuf/events_pb2"
 	"protobuf/state_context_pb2"
 	"protobuf/validator_pb2"
 )

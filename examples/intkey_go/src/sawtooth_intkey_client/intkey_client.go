@@ -31,7 +31,7 @@ import (
 	"math/rand"
 	"net/http"
 	"protobuf/batch_pb2"
-	"protobuf/transaction_pb2"
+	"github.com/hyperledger/sawtooth-sdk-go/src/protobuf/transaction_pb2"
 	"strconv"
 	"strings"
 	"time"

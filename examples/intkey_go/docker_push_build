@@ -1,0 +1,13 @@
+#!/bin/bash
+
+
+DOCKER_IMAGE_NAME=sawtooth-smartcontract
+DOCKER_FULL_IMAGE_NAME=ghcr.io/jffp113/${DOCKER_IMAGE_NAME}:latest
+
+#Must log in
+#docker login ghcr.io -u jffp113 --password-stdin
+
+docker build -t $DOCKER_FULL_IMAGE_NAME -f ./examples/intkey_go/Dockerfile-installed-bionic .
+
+# Push container Azure Container Registry
+docker push $DOCKER_FULL_IMAGE_NAME

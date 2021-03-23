@@ -1,3 +1,14 @@
+#Extended Version of Sawtooth SmartContracts
+
+For my Master thesis we produced this version.
+
+To build the int-key smart contract
+```
+docker build  . -t sawtooth-smartcontract -f examples/intkey_go/Dockerfile-installed-bionic
+```
+
+
+##Other things
 *Build go sdk*
 ```
 go get github.com/hyperledger/sawtooth-sdk-go

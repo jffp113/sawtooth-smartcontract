@@ -22,6 +22,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/sawtooth-sdk-go/logging"
 	"github.com/hyperledger/sawtooth-sdk-go/messaging"
+	"github.com/hyperledger/sawtooth-sdk-go/src/protobuf/smartcontract_pb2"
 	zmq "github.com/pebbe/zmq4"
 	"os"
 	"os/signal"
@@ -252,6 +253,8 @@ func receiveValidator(ids map[string]string, validator, workers messaging.Connec
 	// If this is a new request, put in on the work queue
 	switch t {
 	case validator_pb2.Message_TP_PROCESS_REQUEST:
+		fallthrough
+	case validator_pb2.Message_SMART_CONTRACT_VALIDATE_REQUEST:
 		select {
 		case queue <- msg:
 
@@ -276,6 +279,8 @@ func receiveValidator(ids map[string]string, validator, workers messaging.Connec
 			}
 		}
 		return
+
+
 	case validator_pb2.Message_PING_REQUEST:
 		data, err := proto.Marshal(&network_pb2.PingResponse{})
 		if err != nil {
@@ -349,7 +354,9 @@ func receiveWorkers(ids map[string]string, validator, workers messaging.Connecti
 	corrId := msg.GetCorrelationId()
 
 	// Store which thread the response should be routed to
-	if t != validator_pb2.Message_TP_PROCESS_RESPONSE {
+	if t != validator_pb2.Message_TP_PROCESS_RESPONSE &&
+		t != validator_pb2.Message_SMART_CONTRACT_VALIDATE_REQUEST &&
+		t != validator_pb2.Message_SMART_CONTRACT_VALIDATE_RESPONSE {
 		ids[corrId] = workerId
 	}
 
@@ -458,22 +465,23 @@ func shutdown(queue chan *validator_pb2.Message, worker_count uint, workers_done
 
 // Register a handler with the validator
 func register(validator, shutdown_rx messaging.Connection, handler TransactionHandler, version string, queue chan *validator_pb2.Message, maxOccupancy uint32) error {
-	regRequest := &processor_pb2.TpRegisterRequest{
-		Family:       handler.FamilyName(),
-		Version:      version,
-		Namespaces:   handler.Namespaces(),
-		MaxOccupancy: maxOccupancy,
+	regRequest := &smartcontract_pb2.SmartContractRegisterRequest{
+		SmartContractAddress:  handler.FamilyName(),
 	}
 
 	regRequestData, err := proto.Marshal(regRequest)
+
+
 	if err != nil {
 		return err
 	}
 
 	corrId, err := validator.SendNewMsg(
-		validator_pb2.Message_TP_REGISTER_REQUEST,
+		validator_pb2.Message_SMART_CONTRACT_REGISTER_REQUEST,
 		regRequestData,
 	)
+
+
 	if err != nil {
 		return err
 	}
@@ -493,6 +501,10 @@ func register(validator, shutdown_rx messaging.Connection, handler TransactionHa
 			case validator.Socket():
 				var msg *validator_pb2.Message
 				_, msg, err = validator.RecvMsg()
+
+				logger.Debug(corrId)
+				logger.Debug(msg)
+
 				if err != nil {
 					return err
 				}
@@ -503,17 +515,17 @@ func register(validator, shutdown_rx messaging.Connection, handler TransactionHa
 					queue <- msg
 				}
 
-				if msg.GetMessageType() != validator_pb2.Message_TP_REGISTER_RESPONSE {
+				if msg.GetMessageType() != validator_pb2.Message_SMART_CONTRACT_REGISTER_RESPONSE {
 					return fmt.Errorf("Received unexpected message type: %v", msg.GetMessageType())
 				}
 
-				regResponse := &processor_pb2.TpRegisterResponse{}
+				regResponse := &smartcontract_pb2.SmartContractRegisterResponse{}
 				err = proto.Unmarshal(msg.GetContent(), regResponse)
 				if err != nil {
 					return err
 				}
 
-				if regResponse.GetStatus() != processor_pb2.TpRegisterResponse_OK {
+				if regResponse.GetStatus() != smartcontract_pb2.SmartContractRegisterResponse_OK {
 					return fmt.Errorf("Got response: %v", regResponse.GetStatus())
 				}
 				logger.Infof(

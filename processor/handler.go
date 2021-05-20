@@ -68,11 +68,11 @@ type TransactionHandler interface {
 	// Validate is the single method where all pre-validations are defined.
 	//The method is called by the transaction processor upon receiving a
 	//TpProcessRequest that the handler martContractValidationRequest.
-	Validate(*smartcontract_pb2.SmartContractValidationRequest) (ValidateResponse,error)
+	Validate(*smartcontract_pb2.SmartContractValidationRequest) (ValidateResponse, error)
 }
 
 type ValidateResponse struct {
 	SignatureScheme string
-	N int
-	T int
+	N               int
+	T               int
 }

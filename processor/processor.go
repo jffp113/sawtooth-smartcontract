@@ -280,7 +280,6 @@ func receiveValidator(ids map[string]string, validator, workers messaging.Connec
 		}
 		return
 
-
 	case validator_pb2.Message_PING_REQUEST:
 		data, err := proto.Marshal(&network_pb2.PingResponse{})
 		if err != nil {
@@ -466,11 +465,10 @@ func shutdown(queue chan *validator_pb2.Message, worker_count uint, workers_done
 // Register a handler with the validator
 func register(validator, shutdown_rx messaging.Connection, handler TransactionHandler, version string, queue chan *validator_pb2.Message, maxOccupancy uint32) error {
 	regRequest := &smartcontract_pb2.SmartContractRegisterRequest{
-		SmartContractAddress:  handler.FamilyName(),
+		SmartContractAddress: handler.FamilyName(),
 	}
 
 	regRequestData, err := proto.Marshal(regRequest)
-
 
 	if err != nil {
 		return err
@@ -480,7 +478,6 @@ func register(validator, shutdown_rx messaging.Connection, handler TransactionHa
 		validator_pb2.Message_SMART_CONTRACT_REGISTER_REQUEST,
 		regRequestData,
 	)
-
 
 	if err != nil {
 		return err

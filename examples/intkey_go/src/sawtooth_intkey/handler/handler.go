@@ -24,8 +24,8 @@ import (
 	cbor "github.com/brianolson/cbor_go"
 	"github.com/hyperledger/sawtooth-sdk-go/logging"
 	"github.com/hyperledger/sawtooth-sdk-go/processor"
-	"protobuf/processor_pb2"
 	"github.com/hyperledger/sawtooth-sdk-go/src/protobuf/smartcontract_pb2"
+	"protobuf/processor_pb2"
 	"strings"
 )
 
@@ -39,12 +39,12 @@ type IntkeyPayload struct {
 
 type IntkeyHandler struct {
 	namespace string
+	t,n int
+	scheme string
 }
 
-func NewIntkeyHandler(namespace string) *IntkeyHandler {
-	return &IntkeyHandler{
-		namespace: namespace,
-	}
+func NewIntkeyHandler(namespace string,t,n int, scheme string) *IntkeyHandler {
+	return &IntkeyHandler{namespace,t,n,scheme}
 }
 
 const (
@@ -70,9 +70,9 @@ func (self *IntkeyHandler) Validate(request *smartcontract_pb2.SmartContractVali
 	//TODO implement a more complex logic
 	return processor.ValidateResponse{
 		//Type: THS/normal/multisignature
-		SignatureScheme: "TBLS256",
-		N:               5,
-		T:               3,
+		SignatureScheme: self.scheme,
+		N:               self.n,
+		T:               self.t,
 	}, nil
 }
 

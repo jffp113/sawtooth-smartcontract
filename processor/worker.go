@@ -22,10 +22,10 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/sawtooth-sdk-go/messaging"
-	zmq "github.com/pebbe/zmq4"
-	"protobuf/processor_pb2"
 	"github.com/hyperledger/sawtooth-sdk-go/src/protobuf/smartcontract_pb2"
 	"github.com/hyperledger/sawtooth-sdk-go/src/protobuf/transaction_pb2"
+	zmq "github.com/pebbe/zmq4"
+	"protobuf/processor_pb2"
 	"protobuf/validator_pb2"
 )
 
@@ -44,11 +44,11 @@ func worker(context *zmq.Context, uri string, queue <-chan *validator_pb2.Messag
 	for msg := range queue {
 		switch msg.MessageType {
 		case validator_pb2.Message_TP_PROCESS_REQUEST:
-			if err := execSmartContract(msg,handlers,connection) ; err != nil {
+			if err := execSmartContract(msg, handlers, connection); err != nil {
 				break
 			}
 		case validator_pb2.Message_SMART_CONTRACT_VALIDATE_REQUEST:
-			if err := execValidations(msg,handlers,connection) ; err != nil {
+			if err := execValidations(msg, handlers, connection); err != nil {
 				break
 			}
 		}
@@ -70,7 +70,7 @@ func execValidations(msg *validator_pb2.Message, handlers []TransactionHandler, 
 		return err
 	}
 
-	handler,err := findHandlerForValidation(handlers,request.SmartContractAddress)
+	handler, err := findHandlerForValidation(handlers, request.SmartContractAddress)
 	if err != nil {
 		logger.Errorf("(%v) Failed to find handler: %v", id, err)
 		return err
@@ -114,7 +114,7 @@ func execValidations(msg *validator_pb2.Message, handlers []TransactionHandler, 
 	return nil
 }
 
-func execSmartContract(msg *validator_pb2.Message,handlers []TransactionHandler,connection *messaging.ZmqConnection) error {
+func execSmartContract(msg *validator_pb2.Message, handlers []TransactionHandler, connection *messaging.ZmqConnection) error {
 	id := connection.Identity()
 	request := &processor_pb2.TpProcessRequest{}
 	err := proto.Unmarshal(msg.GetContent(), request)
